@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-
+// import React, { useState, useEffect } from 'react';
+import { MyItemList } from '../Interface/item';
+import {Task} from '../Interface/Task'
 import {
   StyleSheet,
   View,
@@ -18,8 +19,8 @@ export async function getJSONAsyncLogin(userName, password) {
         myHeaders.append("Content-Type", "application/json");
 
         var raw = JSON.stringify({
-        "userNameOrEmailAddress":userName,
-        "password": password,
+        "userNameOrEmailAddress":'khanhnd',
+        "password": 'Khanh914119',
         "twoFactorVerificationCode": "null",
         "rememberClient": "true",
         "twoFactorRememberClientToken": "string",
@@ -92,6 +93,99 @@ export async function getUserData(authen){
     const response = await callApi(url, requestOptions);
     const json = await response;
     return json;
+}
+
+export async function getTaskData(userId, status){
+  // const url = 'http://portalapi.hinnova.vn/api/services/app/HIN_Dashboards/DataResultStore_Param?nameStore=Widget_Redmine_GetDetail&dataSrcId=4&userID_url=10073';
+  var url = 'http://portalapi.hinnova.vn/api/services/app/HIN_Dashboards/DataResultStore_Param?nameStore=Widget_Redmine_GetDetail&dataSrcId=4';
+  if(userId > 0 && status.length != 0 ){
+    url += '&userID_url='+userId;
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    
+    var raw = JSON.stringify([
+      {
+        "Varible": "Tracker",
+        "Value": "Task"
+      },
+      {
+        "Varible": "Status",
+        "Value": status
+      },
+      {
+        "Varible": "title",
+        "Value": status
+      }
+    ]);
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+    const response = await callApi(url, requestOptions);
+    const json = await response;
+    // console.log(json);
+    return json;
+  }else {
+    Alert.alert('Warning!', 'GetTask Fail !')
+  }
+}
+
+export async function getTaskDataByUserAndStatus(userId, lsttatus){
+  
+  if(userId > 0 && lsttatus.length > 0){
+    for (const [i, status] of lsttatus.entries()) {
+      getTaskData(userId, 'Inprogress').then(function(result){   
+        if(result.success == true && result.result.isSucceeded == true){
+            const lstdata = result.result.data;
+            for (const [j, data] of lstdata.entries()) {
+              // Task.id = data.id;
+              // Task.taskName = data.subject;
+              // Task.projectId = data.project_id;
+              // Task.projectName = data.project;
+              // Task.description = data.description;
+              // Task.startDate = data.start_date;
+              // Task.dueDate = data.due_date;
+              // Task.status = data.status_id;
+              const tmp = new Task();
+              console.log(tmp);
+              // console.log(Task.id);
+            }
+         //   lstTask.ad
+        //     // setProject(data.project);
+        //     // setDescription(data.description);
+        //     // setStartDate(data.start_date);
+        //     // setDueDate(data.due_date);
+        //     ['Inprogress', 'Opened', 'Pending', 'Finish']
+        //     switch (status) {
+        //       case 'Inprogress':
+        //         item.id = result.result.data.id
+                
+        //         data.lstTaskInprogress = result.result.data ;
+        //         break;
+        //       case 'Opened':
+        //         data.lstTaskOpened = result.result.data
+        //         break;
+        //       case 'Pending':
+        //         data.lstTaskPending = result.result.data
+        //         break;
+        //       case 'Finish':
+        //         data.lstTaskFinish = result.result.data
+        //         break;            
+        //       default:
+        //         break;
+        //     }
+        }else{
+            Alert.alert('Warning!', 'GetTask Fail !')
+        }
+      })
+    }
+    
+    return Task;
+  }else {
+    Alert.alert('Warning!', 'GetTask Fail !')
+  }
 }
 
 export async function callApi(url,requestOptions){

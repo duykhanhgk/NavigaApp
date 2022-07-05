@@ -52,7 +52,7 @@ export default function LoginScreen({ navigation }) {
             onPressFunction={onPressHandler}
         />
       </ImageBackground>
-        </View>
+    </View>
   );
 }
 

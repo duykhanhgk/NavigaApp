@@ -62,3 +62,4 @@ buck-out/
 /ios/Pods/
 /vendor/bundle/
 node_modules.rar
+node_modules
