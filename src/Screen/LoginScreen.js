@@ -18,12 +18,10 @@ export default function LoginScreen({ navigation }) {
   //Khai bao cac useSate can thiet
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
-  const [data, setData] = useState([]);
  
   useEffect(() => {
    // getData();
   }, []);
-
   const onPressHandler = async () => {
     Login(navigation,userName,password);
    

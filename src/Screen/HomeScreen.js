@@ -1,7 +1,7 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import {getTaskDataByUserAndStatus} from '../Utils/Api';
+import {getTaskData} from '../Utils/Api';
 import {
   StyleSheet,
   View,
@@ -12,12 +12,6 @@ import {
   LogBox,
 } from 'react-native';
 
-const Item = ({ title }) => (
-  <View style={styles.item}>
-    <Text style={styles.title}>{title}</Text>
-  </View>
-);
-
 export default function HomeScreen({ navigation, route }) {
   LogBox.ignoreLogs(['Require cycle:']);
     const { id,
@@ -25,51 +19,104 @@ export default function HomeScreen({ navigation, route }) {
       ten ,
       ho,
       emailAddress} = route.params; 
-    var tmp = '';
-    const numInprocess =  0 ;
-    const numOpened =  0 ;
-    const numPending =  0 ;
-    const numFinish =  0 ;
-    const lsttatus = ['Inprogress', 'Opened', 'Pending', 'Finish'];
     const Stack = createNativeStackNavigator();
-    getTaskDataByUserAndStatus(id, ['Inprogress']).then(function(result){
-        //console.log(result);
-        tmp = result.projectName;
-      // if(result.success == true && result.result.isSucceeded == true){
-      //     const data = result.result.data[0];
-      //     setProject(data.project);
-      //     setDescription(data.description);
-      //     setStartDate(data.start_date);
-      //     setDueDate(data.due_date);
-      // }else{
-      //     Alert.alert('Warning!', 'GetTask Fail !')
-      // }
-    })
+    const [task, setTask] = useState({
+      id: 0,
+      taskName : "" ,
+      projectId: 0,
+      projectName : "",
+      description : "",
+      startDate : "",
+      dueDate : "",
+      status : 0,
+    }); 
+    const [numTask, setNumTask] = useState({
+       numInprocess :  0 ,
+       numOpened :  0 ,
+       numPending :  0 ,
+       numFinish : 0 ,    
+    }); 
+    const lsttatus = ['Inprogress', 'Opened', 'Pending', 'Finish'];
+    const onPressInprogress = async () => {
+      navigation.navigate('Task', 
+        { 
+          id : id , 
+          status : 'Inprogress',
+        }
+      );
+    }
+    const onPressOpened = async () => {
+      navigation.navigate('Task', 
+        { 
+          id : id , 
+          status : 'Opened',
+        }
+      );
+    }
+    const onPressPending = async () => {
+      navigation.navigate('Task', 
+        { 
+          id : id , 
+          status : 'Pending',
+        }
+      );
+    }
+    const onPressFinish = async () => {
+      navigation.navigate('Task', 
+        { 
+          id : id , 
+          status : 'Finish',
+        }
+      );
+    }
 
-      const onPressFunction = async () => {
-        // navigation
-        navigation.navigate('Task', 
-          { 
-            id : id , 
-          }
-        );
-       
-      }
+    useEffect(() => {
+      
+        for (const [i, status] of lsttatus.entries()) {
+          getTaskData(id, status).then(function(result){
+            if(result.success == true && result.result.isSucceeded == true){
+               const data = result.result.data;
+              if(status === 'Inprogress'){
+                setNumTask(previousState => {
+                  return { ...previousState, numInprocess: data.length }
+                });
+              }else if (status === 'Opened'){
+                setNumTask(previousState => {
+                  return { ...previousState, numOpened: data.length }
+                });
+              }else if (status === 'Pending'){
+                setNumTask(previousState => {
+                  return { ...previousState, numPending: data.length }
+                });
+              }else if (status === 'Finish') {
+                setNumTask(previousState => {
+                  return { ...previousState, numFinish: data.length }
+                });
+              }
+            }else{
+                Alert.alert('Warning!', 'GetTask '+status+' Fail !') 
+            }
+          })
+        }
+
+        
+    }, []);
+    
+
+   
     return (
       <View  style={styles.container}>
-        <Text>{tmp}</Text>
-        {/* Task inprocess */}
-        <Pressable onPress={onPressFunction} style={styles.titleInprogress}>
-          <Text style={styles.textTask}>Inprogress : {numInprocess}</Text>
+        <Pressable onPress={onPressInprogress} style={styles.titleInprogress}>
+          <Text style={styles.textTask}>Inprogress : {numTask.numInprocess}</Text>
         </Pressable>
-        <Pressable onPress={onPressFunction} style={styles.titleOpened}>
-          <Text style={styles.textTask}>Opened : {numOpened}</Text>
+        <Pressable onPress={onPressOpened} style={styles.titleOpened}>
+          <Text style={styles.textTask}>Opened : {numTask.numOpened}</Text>
         </Pressable>
-        <Pressable onPress={onPressFunction} style={styles.titlePending}>
-          <Text style={styles.textTask}>Pending : {numPending}</Text>
+        <Pressable onPress={onPressPending} style={styles.titlePending}>
+          <Text style={styles.textTask}>Pending : {numTask.numPending}</Text>
         </Pressable>
-        <Pressable onPress={onPressFunction} style={styles.titleFinish}>
-          <Text style={styles.textTask}>Finish : {numFinish}</Text>
+        <Pressable onPress={onPressFinish} style={styles.titleFinish}>
+          <Text style={styles.textTask}>Finish : {numTask.numFinish}</Text>
         </Pressable>
       </View>
 

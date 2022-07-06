@@ -23,25 +23,23 @@ export default function TaskScreen({ navigation, route }) {
     const [startDate, setStartDate] = useState('');
     const [dueDate, setDueDate] = useState('');
     navigation.setOptions({ title: 'Inprogress!' });
-    const { id } = route.params;
-    //Load Data
-    // const onPressHandler = async () => {
-    // getTaskData().then(function(result)){
+    const { id, status } = route.params;
 
-    // };
-    // console.log(2);
-    getTaskData(id, 'Inprogress').then(function(result){
-        if(result.success == true && result.result.isSucceeded == true){
-         //   const data = result.result.data[0];
-            setProject(data.project);
-            setDescription(data.description);
-            setStartDate(data.start_date);
-            setDueDate(data.due_date);
-        }else{
-            Alert.alert('Warning!', 'GetTask Fail !')
-        }
-   })
-    // }
+    
+
+   useEffect(() => {
+    getTaskData(id, status).then(function(result){
+      if(result.success == true && result.result.isSucceeded == true){
+          const data = result.result.data[0];
+          setProject(data.project);
+          setDescription(data.description);
+          setStartDate(data.start_date);
+          setDueDate(data.due_date);
+      }else{
+          Alert.alert('Warning!', 'GetTask Fail !')
+      }
+    })
+  },[]);
     
 
     return (
@@ -52,19 +50,20 @@ export default function TaskScreen({ navigation, route }) {
                 <Text style = {styles.textItem}> Description: {description} </Text>
                 <Text style = {styles.textItem}> Start date: {moment(startDate).format('DD/MM/YYYY')} </Text>
                 <Text style = {styles.textItem}> Due date: {moment(dueDate).format('DD/MM/YYYY')} </Text>
+                <View style = {styles.containerRow}>
+                  <CustomButton
+                  title='Finish'
+                  color='rgb(0, 150, 136)'
+                  //onPressFunction={onPressHandler}
+                  />
+                  <CustomButton
+                  title='Pending'
+                  color='rgb(255, 178, 43)'
+                // onPressFunction={onPressHandler}
+                  />
+                </View>
             </View>
-            <View style = {styles.containerRow}>
-            <CustomButton
-            title='Finish'
-            color='rgb(0, 150, 136)'
-            //onPressFunction={onPressHandler}
-            />
-            <CustomButton
-            title='Pending'
-            color='rgb(255, 178, 43)'
-           // onPressFunction={onPressHandler}
-            />
-            </View>
+
         </View>
         
     );
@@ -106,17 +105,18 @@ export default function TaskScreen({ navigation, route }) {
         width : '100%',
         height : '50%',
         fontSize: 32,
-        backgroundColor: 'white' ,
-        borderColor : 'white',
-        borderWidth : 5 ,
-        borderRadius : 10,
+        //backgroundColor: 'white' ,
+        //borderColor : 'white',
+        //borderWidth : 5 ,
+        // borderRadius : 10,
         justifyContent : 'center',
         alignItems : 'center',
     },
     textItem : {
         fontSize: 11,
+        fontWeight : 'bold',
         backgroundColor: 'white',
-        padding: 20,
+        padding: 10,
         marginVertical: 8,
         marginHorizontal: 16,
         borderRadius : 10,
