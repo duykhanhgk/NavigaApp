@@ -11,61 +11,110 @@ import {
   Alert,
   Button,
   LogBox,
+  FlatList
+  
 } from 'react-native';
 import CustomButton from '../Utils/CustomButton';
 import { getTaskData } from '../Utils/Api';
 
+
+
+
+
 export default function TaskScreen({ navigation, route }) {
     LogBox.ignoreLogs(['Require cycle:']);
-      //Khai bao cac useSate can thiet
-    const [project, setProject] = useState('');
-    const [description, setDescription] = useState('');
-    const [startDate, setStartDate] = useState('');
-    const [dueDate, setDueDate] = useState('');
-    navigation.setOptions({ title: 'Inprogress!' });
+    
     const { id, status } = route.params;
+    navigation.setOptions({ title: status });
 
-    
+    const [task, setTask] = useState({
+      id :  0 ,
+      subject :  '' ,
+      start_date : '' , 
+      due_date : '', 
+      status : '',  
+   });  
+   const [lstTask1, setLstTask1] = useState(null);
+   const lstTask=  [] ;
+   
+  const GroupBtnInprogess = () => (
+    <View style = {styles.containerRow}>
+      <CustomButton
+      title='Finish'
+      color='rgb(0, 150, 136)'
+      //onPressFunction={onPressHandler}
+      />
+      <CustomButton
+      title='Pending'
+      color='rgb(255, 178, 43)'
+    // onPressFunction={onPressHandler}
+      />
+    </View>
+   );
 
-   useEffect(() => {
-    getTaskData(id, status).then(function(result){
-      if(result.success == true && result.result.isSucceeded == true){
-          const data = result.result.data[0];
-          setProject(data.project);
-          setDescription(data.description);
-          setStartDate(data.start_date);
-          setDueDate(data.due_date);
-      }else{
-          Alert.alert('Warning!', 'GetTask Fail !')
-      }
-    })
-  },[]);
-    
+   const GroupBtnPending = () => (
+    <View style = {styles.containerRow}>
+      <CustomButton
+      title='Inprogess'
+      color='rgb(255, 178, 43)'
+      //onPressFunction={onPressHandler}
+      />
+    </View>
+   );
 
-    return (
-        <View style = {styles.container}>
-            <View style = {styles.titleInprogress}>
-                {/* <View style = {styles.containerRow}> */}
-                <Text style = {styles.textItem}> PROJECT: {project} </Text>
-                <Text style = {styles.textItem}> Description: {description} </Text>
-                <Text style = {styles.textItem}> Start date: {moment(startDate).format('DD/MM/YYYY')} </Text>
-                <Text style = {styles.textItem}> Due date: {moment(dueDate).format('DD/MM/YYYY')} </Text>
-                <View style = {styles.containerRow}>
-                  <CustomButton
-                  title='Finish'
-                  color='rgb(0, 150, 136)'
-                  //onPressFunction={onPressHandler}
-                  />
-                  <CustomButton
-                  title='Pending'
-                  color='rgb(255, 178, 43)'
-                // onPressFunction={onPressHandler}
-                  />
-                </View>
+
+
+   const renderItem  = ({ item }) => (
+    <View style = {styles.container}>
+        <View style = {styles.titleInprogress}>
+            <Text style = {styles.textItem}> Id: {item.id} </Text>
+            <Text style = {styles.textItem}> Subject: {item.subject} </Text>
+            <Text style = {styles.textItem}> Start date: {moment(item.start_date).format('DD/MM/YYYY')} </Text>
+            <Text style = {styles.textItem}> Due date: {moment(item.due_date).format('DD/MM/YYYY')} </Text>
+            <View>
+              {item.status_id == 3 ? <GroupBtnInprogess></GroupBtnInprogess> : null }
+              {item.status_id == 4 ? <GroupBtnPending></GroupBtnPending> : null }
             </View>
 
         </View>
-        
+    </View>
+  );
+    useEffect(() => {
+      getTaskData(id, status).then(function(result){
+        if(result.success == true && result.result.isSucceeded == true ){
+            if(result.result.data.length > 0){
+              const lstdata = result.result.data;
+              for (const [i, data] of lstdata.entries()) {
+                lstTask.push({
+                  id :  data.id,
+                  subject :  data.subject ,
+                  start_date : data.start_date , 
+                  due_date : data.due_date,   
+                  status_id : data.status_id,
+                });
+              }
+              setLstTask1(lstTask);
+            }else{
+              Alert.alert('Warning!', 'No Task !')
+            }
+            
+        }else{
+            Alert.alert('Warning!', 'GetTask Fail !')
+        }
+      })
+    },[]);
+    if (lstTask1 == null  || lstTask1[0].id === 0) {
+      return <Text>Still loading...</Text>;
+    }
+    return (
+      
+     <SafeAreaView >
+      <FlatList
+        data={lstTask1}
+        renderItem={renderItem}
+       // keyExtractor={item => item.id}
+      />
+     </SafeAreaView>
     );
   }
 
@@ -86,8 +135,8 @@ export default function TaskScreen({ navigation, route }) {
       fontSize: 24
     },
     titleInprogress: {
-      width : '100%',
-      height : '50%',
+      // width : '100%',
+      // height : '100%',
       item : 'center',
       fontSize: 32,
       backgroundColor: 'rgb(116, 96, 238)' ,
