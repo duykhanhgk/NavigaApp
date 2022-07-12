@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 import {getTaskData} from '../Utils/Api';
 import {
   StyleSheet,
@@ -19,17 +20,8 @@ export default function HomeScreen({ navigation, route }) {
       ten ,
       ho,
       emailAddress} = route.params; 
-    const Stack = createNativeStackNavigator();
-    const [task, setTask] = useState({
-      id: 0,
-      taskName : "" ,
-      projectId: 0,
-      projectName : "",
-      description : "",
-      startDate : "",
-      dueDate : "",
-      status : 0,
-    }); 
+    const focus = useIsFocused();  // use if focus as shown 
+    const [userId, setUserId] = useState(id);
     const [numTask, setNumTask] = useState({
        numInprocess :  0 ,
        numOpened :  0 ,
@@ -40,7 +32,7 @@ export default function HomeScreen({ navigation, route }) {
     const onPressInprogress = async () => {
       navigation.navigate('Task', 
         { 
-          id : id , 
+          id : userId , 
           status : 'Inprogress',
         }
       );
@@ -48,7 +40,7 @@ export default function HomeScreen({ navigation, route }) {
     const onPressOpened = async () => {
       navigation.navigate('Task', 
         { 
-          id : id , 
+          id : userId , 
           status : 'Opened',
         }
       );
@@ -56,7 +48,7 @@ export default function HomeScreen({ navigation, route }) {
     const onPressPending = async () => {
       navigation.navigate('Task', 
         { 
-          id : id , 
+          id : userId , 
           status : 'Pending',
         }
       );
@@ -64,7 +56,7 @@ export default function HomeScreen({ navigation, route }) {
     const onPressFinish = async () => {
       navigation.navigate('Task', 
         { 
-          id : id , 
+          id : userId , 
           status : 'Finish',
         }
       );
@@ -73,7 +65,7 @@ export default function HomeScreen({ navigation, route }) {
     useEffect(() => {
       
         for (const [i, status] of lsttatus.entries()) {
-          getTaskData(id, status).then(function(result){
+          getTaskData(userId, status).then(function(result){
             if(result.success == true && result.result.isSucceeded == true){
                const data = result.result.data;
               if(status === 'Inprogress'){
@@ -100,7 +92,7 @@ export default function HomeScreen({ navigation, route }) {
         }
 
         
-    }, []);
+    }, [focus]);
     
 
    

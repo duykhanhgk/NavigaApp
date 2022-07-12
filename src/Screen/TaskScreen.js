@@ -15,52 +15,102 @@ import {
   
 } from 'react-native';
 import CustomButton from '../Utils/CustomButton';
-import { getTaskData } from '../Utils/Api';
+import { getTaskData, changeStatus } from '../Utils/Api';
 
 
 
 
+//  const onPressHandle = async (id,status) => {
+//     //check có task đang inprogress không nếu có cần top trước
+//     if(status === 'Inprogress'){
+//       getTaskData(id, status).then(function(result){
+//         if(result.success == true && result.result.isSucceeded == true ){
+//             if(result.result.data.length > 0){
+//               Alert.alert('Warning!', 'Hiện đang có Task Inprogress, Vui lòng Stop trước khi start !');
+//             }else{//khong có task dang chay, inprogress task này
+//               changeStatus(id,status).then(function(result){
+//                 if(result.success == true && result.result.isSucceeded == true ){
+//                   navigation.navigate('Home');
+//                 }else{
+//                   Alert.alert('Warning!', 'Change Task không thành công!');
+//                 }
+//               })
+//             }   
+//         }else{
+//             Alert.alert('Warning!', 'GetTask Fail !')
+//         }
+//       })
+//     }   
+//   // navigation.navigate('Task', 
+//   //   { 
+//   //     id : id , 
+//   //     status : 'Opened',
+//   //   }
+//   // );
+// }
 
 export default function TaskScreen({ navigation, route }) {
     LogBox.ignoreLogs(['Require cycle:']);
     
     const { id, status } = route.params;
-    navigation.setOptions({ title: status });
-
-    const [task, setTask] = useState({
-      id :  0 ,
-      subject :  '' ,
-      start_date : '' , 
-      due_date : '', 
-      status : '',  
-   });  
+    const [userId, setUserId] = useState(id);
+ 
    const [lstTask1, setLstTask1] = useState(null);
    const lstTask=  [] ;
-   
-  const GroupBtnInprogess = () => (
+   const GroupBtnInprogess = ({id}) => (
     <View style = {styles.containerRow}>
       <CustomButton
       title='Finish'
       color='rgb(0, 150, 136)'
-      //onPressFunction={onPressHandler}
+      //onPressFunction={() =>  onPressHandle(id,'Finish')}
       />
       <CustomButton
       title='Pending'
       color='rgb(255, 178, 43)'
-    // onPressFunction={onPressHandler}
+      onPressFunction={() => onPressHandle(id,'Pending')}
       />
     </View>
    );
-
-   const GroupBtnPending = () => (
+  
+   const GroupBtnPending = ({id}) => (
     <View style = {styles.containerRow}>
       <CustomButton
-      title='Inprogess'
+      title='Inprogress'
       color='rgb(255, 178, 43)'
-      //onPressFunction={onPressHandler}
+      onPressFunction={() => onPressHandle(id,'Inprogress')}
       />
     </View>
    );
+   const onPressHandle = async (id,status) => {
+    //check có task đang inprogress không nếu có cần top trước
+    if(status == 'Inprogress'){
+      getTaskData(userId, status).then(function(result){
+        if(result.success == true && result.result.isSucceeded == true ){
+            if(result.result.data.length > 0){
+              Alert.alert('Warning!', 'Hiện đang có Task Inprogress, Vui lòng Stop trước khi start !');
+            }else{//khong có task dang chay, inprogress task này
+              changeStatus(id,status).then(function(result1){
+                if(result1.success == true && result1.result.isSucceeded == true ){
+                  navigation.navigate('Home',{});
+                }else{
+                  Alert.alert('Warning!', 'Change Task không thành công!');
+                }
+              })
+            }   
+        }else{
+            Alert.alert('Warning!', 'GetTask Fail !')
+        }
+      })
+    }else{
+      changeStatus(id,status).then(function(result){
+        if(result.success == true && result.result.isSucceeded == true ){
+          navigation.navigate('Home',{});
+        }else{
+          Alert.alert('Warning!', 'Change Task không thành công!');
+        }
+      })
+    }
+  }
 
 
 
@@ -72,15 +122,18 @@ export default function TaskScreen({ navigation, route }) {
             <Text style = {styles.textItem}> Start date: {moment(item.start_date).format('DD/MM/YYYY')} </Text>
             <Text style = {styles.textItem}> Due date: {moment(item.due_date).format('DD/MM/YYYY')} </Text>
             <View>
-              {item.status_id == 3 ? <GroupBtnInprogess></GroupBtnInprogess> : null }
-              {item.status_id == 4 ? <GroupBtnPending></GroupBtnPending> : null }
+              {item.status_id == 3 ? <GroupBtnInprogess id = {item.id}></GroupBtnInprogess> : null }
+              {item.status_id == 4 ? <GroupBtnPending id = {item.id}></GroupBtnPending> : null }
+              {item.status_id == 1 ? <GroupBtnPending></GroupBtnPending> : null }
+              {/* {item.status_id == 5 ? <GroupBtnPending></GroupBtnPending> : null }  */}
             </View>
 
         </View>
     </View>
   );
     useEffect(() => {
-      getTaskData(id, status).then(function(result){
+      navigation.setOptions({ title: status });
+      getTaskData(userId, status).then(function(result){
         if(result.success == true && result.result.isSucceeded == true ){
             if(result.result.data.length > 0){
               const lstdata = result.result.data;

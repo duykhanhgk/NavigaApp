@@ -18,8 +18,8 @@ export async function getJSONAsyncLogin(userName, password) {
         myHeaders.append("Content-Type", "application/json");
 
         var raw = JSON.stringify({
-        "userNameOrEmailAddress":'khanhnd',
-        "password": 'Khanh914119',
+        "userNameOrEmailAddress":userName,
+        "password": password,
         "twoFactorVerificationCode": "null",
         "rememberClient": "true",
         "twoFactorRememberClientToken": "string",
@@ -131,7 +131,35 @@ export async function getTaskData(userId, status){
   }
 }
 
+export async function changeStatus(id, status){
+  // const url = 'http://portalapi.hinnova.vn/api/services/app/HIN_Dashboards/DataResultStore_Param?nameStore=Widget_Redmine_GetDetail&dataSrcId=4&userID_url=10073';
+  var url = 'http://portalapi.hinnova.vn/api/services/app/Redmine/DataResultStore?nameStore=';
 
+  if(id > 0 && status.length > 0 ){
+    if(status === 'Pending'){
+      url+= 'Widget_RM_ChangeStatus_Pending';
+    }else if (status === 'Inprogress'){
+      url+= 'Widget_RM_ChangeStatus_Inprogress';
+    }
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    
+    var raw = JSON.stringify([
+      {Key: "Id", Value: id}
+    ]);
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+      redirect: 'follow'
+    };
+    const response = await callApi(url, requestOptions);
+    const json = await response;
+    return json;
+  }else {
+    Alert.alert('Warning!', 'Change Fail !')
+  }
+}
 
 export async function callApi(url,requestOptions){
     const response = await fetch(url, requestOptions);
