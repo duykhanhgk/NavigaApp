@@ -1,4 +1,4 @@
-package com.navigaapp.newarchitecture.components;
+package com.program.logtime.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

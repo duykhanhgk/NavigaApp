@@ -127,7 +127,7 @@ export async function getTaskData(userId, status){
     // console.log(json);
     return json;
   }else {
-    Alert.alert('Warning!', 'GetTask Fail !')
+    Alert.alert('Warning!', 'Lỗi UserId hoặc status : ' + userId + ', ' + status)
   }
 }
 

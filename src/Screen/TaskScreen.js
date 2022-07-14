@@ -124,7 +124,7 @@ export default function TaskScreen({ navigation, route }) {
             <View>
               {item.status_id == 3 ? <GroupBtnInprogess id = {item.id}></GroupBtnInprogess> : null }
               {item.status_id == 4 ? <GroupBtnPending id = {item.id}></GroupBtnPending> : null }
-              {item.status_id == 1 ? <GroupBtnPending></GroupBtnPending> : null }
+              {item.status_id == 1 ? <GroupBtnPending id = {item.id}></GroupBtnPending> : null }
               {/* {item.status_id == 5 ? <GroupBtnPending></GroupBtnPending> : null }  */}
             </View>
 
