@@ -5,11 +5,8 @@ import {
   StyleSheet,
   View,
   Text,
-  Pressable,
   SafeAreaView,
-  SectionList,
   Alert,
-  Button,
   LogBox,
   FlatList
   
@@ -17,37 +14,6 @@ import {
 import CustomButton from '../Utils/CustomButton';
 import { getTaskData, changeStatus } from '../Utils/Api';
 
-
-
-
-//  const onPressHandle = async (id,status) => {
-//     //check có task đang inprogress không nếu có cần top trước
-//     if(status === 'Inprogress'){
-//       getTaskData(id, status).then(function(result){
-//         if(result.success == true && result.result.isSucceeded == true ){
-//             if(result.result.data.length > 0){
-//               Alert.alert('Warning!', 'Hiện đang có Task Inprogress, Vui lòng Stop trước khi start !');
-//             }else{//khong có task dang chay, inprogress task này
-//               changeStatus(id,status).then(function(result){
-//                 if(result.success == true && result.result.isSucceeded == true ){
-//                   navigation.navigate('Home');
-//                 }else{
-//                   Alert.alert('Warning!', 'Change Task không thành công!');
-//                 }
-//               })
-//             }   
-//         }else{
-//             Alert.alert('Warning!', 'GetTask Fail !')
-//         }
-//       })
-//     }   
-//   // navigation.navigate('Task', 
-//   //   { 
-//   //     id : id , 
-//   //     status : 'Opened',
-//   //   }
-//   // );
-// }
 
 export default function TaskScreen({ navigation, route }) {
     LogBox.ignoreLogs(['Require cycle:']);
@@ -117,10 +83,15 @@ export default function TaskScreen({ navigation, route }) {
    const renderItem  = ({ item }) => (
     <View style = {styles.container}>
         <View style = {styles.titleInprogress}>
-            <Text style = {styles.textItem}> Id: {item.id} </Text>
+            {/* <Text style = {styles.textItem}> Id: {item.id} </Text> */}
+            <Text style = {styles.textItem}> Project: {item.project} </Text>
             <Text style = {styles.textItem}> Subject: {item.subject} </Text>
-            <Text style = {styles.textItem}> Start date: {moment(item.start_date).format('DD/MM/YYYY')} </Text>
-            <Text style = {styles.textItem}> Due date: {moment(item.due_date).format('DD/MM/YYYY')} </Text>
+            <Text style = {styles.textItem}> Description: {item.description} </Text>
+            <View style = {styles.containerRow}> 
+              <Text style = {styles.textItemHaft}> Start date: {moment(item.start_date).format('DD/MM/YYYY')} </Text>
+              <Text style = {styles.textItemHaft}> Due date: {moment(item.due_date).format('DD/MM/YYYY')} </Text>
+            </View>
+            
             <View>
               {item.status_id == 3 ? <GroupBtnInprogess id = {item.id}></GroupBtnInprogess> : null }
               {item.status_id == 4 ? <GroupBtnPending id = {item.id}></GroupBtnPending> : null }
@@ -138,9 +109,12 @@ export default function TaskScreen({ navigation, route }) {
             if(result.result.data.length > 0){
               const lstdata = result.result.data;
               for (const [i, data] of lstdata.entries()) {
+                console.log(data);
                 lstTask.push({
                   id :  data.id,
+                  project : data.project ,
                   subject :  data.subject ,
+                  description : data.description ,
                   start_date : data.start_date , 
                   due_date : data.due_date,   
                   status_id : data.status_id,
@@ -222,6 +196,16 @@ export default function TaskScreen({ navigation, route }) {
         marginVertical: 8,
         marginHorizontal: 16,
         borderRadius : 10,
-    }
+    },
+
+    textItemHaft : {
+      fontSize: 11,
+      fontWeight : 'bold',
+      backgroundColor: 'white',
+      padding: 10,
+      marginVertical: 8,
+      marginHorizontal: 22,
+      borderRadius : 10,
+  }
   });
   
